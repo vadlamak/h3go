@@ -1,0 +1,8 @@
+module github.com/vadlamak/h3go
+
+go 1.13
+
+require (
+	github.com/gistao/RedisGo-Async v0.0.0-20180809020228-149e8061d174
+	github.com/uber/h3-go v3.0.1+incompatible
+)
