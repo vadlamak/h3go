@@ -3,13 +3,14 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/gistao/RedisGo-Async/redis"
+	//"github.com/tidwall/gjson"
+	geojson "github.com/paulmach/go.geojson"
 )
 
 //initialize logger
@@ -17,27 +18,6 @@ var (
 	buf    bytes.Buffer
 	logger = log.New(&buf, "logger: ", log.Lshortfile)
 )
-
-type GeoCoord struct {
-	Latitude, Longitude float64
-}
-
-type InnerLoop struct {
-	Temp []GeoCoord
-}
-
-type OuterLoop struct {
-	Temp []InnerLoop
-}
-
-type Polygon struct {
-	Temp []OuterLoop
-}
-
-type geojson struct {
-	Type        string  `json:"type"`
-	Coordinates Polygon `json:"coordinates"`
-}
 
 func logError(e error) {
 	if e != nil {
@@ -68,6 +48,35 @@ func getGeoJson(record []string) string {
 	return record[6]
 }
 
+func processPolygon(polygon [][][]float64) {
+	println(len(polygon[0]))
+	if len(polygon) > 0 && len(polygon) == 1 {
+		for i := 0; i < len(polygon[0]); i++ {
+			if len(polygon[0][i]) == 2 {
+				print(polygon[0][i][0])
+				print(":", polygon[0][i][1])
+				println()
+
+			} else {
+				println("should never happen")
+			}
+
+		}
+	} else {
+		//throw error
+		println("handle me")
+	}
+
+	//h3.GeoPolygon
+
+}
+func processMultiPolygon(mPolygon [][][][]float64) {
+	println(mPolygon[0][0][0][1])
+	for i := 0; i < len(mPolygon); i++ {
+		processPolygon(mPolygon[i])
+	}
+}
+
 func main() {
 	start := time.Now()
 	fileName := getFileName()
@@ -81,28 +90,17 @@ func main() {
 	//skip header
 	header, _ := r.Read()
 	fmt.Println(header)
-
 	rec, _ := r.Read()
-	var geojson1 geojson
-	j := getGeoJson(rec)
-	//fmt.Println(j)
-	err := json.Unmarshal([]byte(j), &geojson1)
-	fmt.Println("error", err)
+	gjson := getGeoJson(rec)
+	rawGeometryJSON := []byte(gjson)
+	g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
 	logError(err)
-	fmt.Println("unmarshalled")
-	fmt.Println(geojson1)
-	// fmt.Println(rec)
-	// for {
-	// 	// Read each record from csv
-	// 	record, err := r.Read()
-	// 	if err == io.EOF {
-	// 		logger.Println("finished reading the file")
-	// 		break
-	// 	}
-	// 	logError(err)
-	// 	count++
-	// 	fmt.Println(record)
-	// }
+	println(g.IsMultiPolygon())
+	println(g.Type)
+	mPolygon := g.MultiPolygon
+	//processMultiPolygon(mPolygon)
+	processPolygon(mPolygon[0])
+	//println(mPolygon[0][0][0][1])
 
 	t := time.Now()
 	elapsed := t.Sub(start)
