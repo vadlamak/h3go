@@ -25,27 +25,51 @@ func logError(e error) {
 		logger.Fatal(e)
 	}
 }
+func getConn() redis.AsynConn {
+	//create conn to standalone redis
+	c, err := redis.AsyncDial("tcp", ":6379")
+	logError(err)
+	return c
+}
+func closeConn(c redis.AsynConn) {
+	defer c.Close()
+}
+func getFileName() string {
+	return os.Args[1]
+}
+
+func getLatIndex() (int, error) {
+	return strconv.Atoi(os.Args[2])
+}
+
+func getLonIndex() (int, error) {
+	return strconv.Atoi(os.Args[3])
+}
+
+func getGroundResolution() (int, error) {
+	return strconv.Atoi(os.Args[4])
+}
+
+func getFileReader(fileName string) *csv.Reader {
+	//read the file
+	f, err := os.Open("../samples/" + fileName)
+	logError(err)
+	return csv.NewReader(f)
+}
 
 func main() {
 
 	start := time.Now()
 
-	//create conn to standalone redis
-	c, err := redis.AsyncDial("tcp", ":6379")
-	logError(err)
+	fileName := getFileName()
+	latIndex, _ := getLatIndex()
+	lonIndex, _ := getLonIndex()
+	ground_resolution, _ := getGroundResolution()
 
-	fileName := os.Args[1]
-	latIndex, _ := strconv.Atoi(os.Args[2])
-	lonIndex, _ := strconv.Atoi(os.Args[3])
-	ground_resolution, _ := strconv.Atoi(os.Args[4])
 	logger.Print("passed args: ")
 	logger.Println(os.Args)
 
-	//read the file
-	f, err := os.Open("../samples/" + fileName)
-	logError(err)
-
-	r := csv.NewReader(f)
+	r := getFileReader(fileName)
 
 	//skip header
 	r.Read()
@@ -74,10 +98,11 @@ func main() {
 			count++
 		}
 	}
+
 	t := time.Now()
 	elapsed := t.Sub(start)
 	logger.Println("elapsed time: ", elapsed)
 	logger.Println("total records written: %d", count)
-	defer c.Close()
+
 	fmt.Println(&buf)
 }
