@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/gistao/RedisGo-Async/redis"
-	//"github.com/tidwall/gjson"
-	geojson "github.com/paulmach/go.geojson"
+	"github.com/paulmach/orb/geojson"
+	h3 "github.com/uber/h3-go"
 )
 
 //initialize logger
@@ -48,14 +48,24 @@ func getGeoJson(record []string) string {
 	return record[6]
 }
 
+func getGeocoord(arr []float64) h3.GeoCoord {
+	return h3.GeoCoord{
+		Latitude:  arr[1],
+		Longitude: arr[0],
+	}
+}
+
 func processPolygon(polygon [][][]float64) {
 	println(len(polygon[0]))
 	if len(polygon) > 0 && len(polygon) == 1 {
 		for i := 0; i < len(polygon[0]); i++ {
 			if len(polygon[0][i]) == 2 {
-				print(polygon[0][i][0])
-				print(":", polygon[0][i][1])
-				println()
+				// print(polygon[0][i][0])
+				// print(":", polygon[0][i][1])
+				// println()
+				geo := getGeocoord(polygon[0][i])
+				println("lat: %f", geo.Latitude)
+				println("lon: %f", geo.Longitude)
 
 			} else {
 				println("should never happen")
@@ -71,7 +81,7 @@ func processPolygon(polygon [][][]float64) {
 
 }
 func processMultiPolygon(mPolygon [][][][]float64) {
-	println(mPolygon[0][0][0][1])
+	//println(mPolygon[0][0][0][1])
 	for i := 0; i < len(mPolygon); i++ {
 		processPolygon(mPolygon[i])
 	}
@@ -92,15 +102,14 @@ func main() {
 	fmt.Println(header)
 	rec, _ := r.Read()
 	gjson := getGeoJson(rec)
-	rawGeometryJSON := []byte(gjson)
-	g, err := geojson.UnmarshalGeometry(rawGeometryJSON)
+	rawData := []byte(gjson)
+	geoJsonGeom := &geojson.Geometry{}
+	err := geoJsonGeom.UnmarshalJSON(rawData)
 	logError(err)
-	println(g.IsMultiPolygon())
-	println(g.Type)
-	mPolygon := g.MultiPolygon
-	//processMultiPolygon(mPolygon)
-	processPolygon(mPolygon[0])
-	//println(mPolygon[0][0][0][1])
+	orbGeom := geoJsonGeom.Geometry() //convert to diff geometry type
+	println("GeoJSONType: ", orbGeom.GeoJSONType())
+	println("Dimensions: ", orbGeom.Dimensions())
+	println("closed?: ", orbGeom.Bound().ToRing().Closed())
 
 	t := time.Now()
 	elapsed := t.Sub(start)
