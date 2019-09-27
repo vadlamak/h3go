@@ -4,13 +4,11 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"github.com/tidwall/gjson"
+	"github.com/uber/h3-go"
 	"log"
 	"os"
 	"time"
-
-	"github.com/gistao/RedisGo-Async/redis"
-	"github.com/paulmach/orb/geojson"
-	h3 "github.com/uber/h3-go"
 )
 
 //initialize logger
@@ -24,15 +22,7 @@ func logError(e error) {
 		logger.Fatal(e)
 	}
 }
-func getConn() redis.AsynConn {
-	//create conn to standalone redis
-	c, err := redis.AsyncDial("tcp", ":6379")
-	logError(err)
-	return c
-}
-func closeConn(c redis.AsynConn) {
-	defer c.Close()
-}
+
 func getFileName() string {
 	return os.Args[1]
 }
@@ -55,38 +45,6 @@ func getGeocoord(arr []float64) h3.GeoCoord {
 	}
 }
 
-func processPolygon(polygon [][][]float64) {
-	println(len(polygon[0]))
-	if len(polygon) > 0 && len(polygon) == 1 {
-		for i := 0; i < len(polygon[0]); i++ {
-			if len(polygon[0][i]) == 2 {
-				// print(polygon[0][i][0])
-				// print(":", polygon[0][i][1])
-				// println()
-				geo := getGeocoord(polygon[0][i])
-				println("lat: %f", geo.Latitude)
-				println("lon: %f", geo.Longitude)
-
-			} else {
-				println("should never happen")
-			}
-
-		}
-	} else {
-		//throw error
-		println("handle me")
-	}
-
-	//h3.GeoPolygon
-
-}
-func processMultiPolygon(mPolygon [][][][]float64) {
-	//println(mPolygon[0][0][0][1])
-	for i := 0; i < len(mPolygon); i++ {
-		processPolygon(mPolygon[i])
-	}
-}
-
 func main() {
 	start := time.Now()
 	fileName := getFileName()
@@ -101,15 +59,12 @@ func main() {
 	header, _ := r.Read()
 	fmt.Println(header)
 	rec, _ := r.Read()
-	gjson := getGeoJson(rec)
-	rawData := []byte(gjson)
-	geoJsonGeom := &geojson.Geometry{}
-	err := geoJsonGeom.UnmarshalJSON(rawData)
-	logError(err)
-	orbGeom := geoJsonGeom.Geometry() //convert to diff geometry type
-	println("GeoJSONType: ", orbGeom.GeoJSONType())
-	println("Dimensions: ", orbGeom.Dimensions())
-	println("closed?: ", orbGeom.Bound().ToRing().Closed())
+	jsonStr := getGeoJson(rec)
+	result := gjson.Parse(jsonStr)
+	polygon,_:= GjsonCoordsToPolygon(result)
+	extCoord := polygon.Exterior.Vertices()
+	println("extCoords")
+	println(extCoord)
 
 	t := time.Now()
 	elapsed := t.Sub(start)
