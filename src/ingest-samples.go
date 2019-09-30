@@ -26,6 +26,7 @@ func getConn() redis.AsynConn {
 func closeConn(c redis.AsynConn) {
 	defer c.Close()
 }
+
 //func getFileName() string {
 //	return os.Args[1]
 //}
@@ -100,4 +101,4 @@ func main() {
 	fmt.Println(&buf)
 }
 
- */
+*/

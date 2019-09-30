@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"github.com/h3go/src/third-party"
 	"github.com/tidwall/gjson"
 	"github.com/uber/h3-go"
 	"log"
@@ -57,12 +58,19 @@ func main() {
 
 	//skip header
 	header, _ := r.Read()
+	r.Read() //skip multiPolygon
 	fmt.Println(header)
 	rec, _ := r.Read()
 	jsonStr := getGeoJson(rec)
-	result := gjson.Parse(jsonStr)
-	polygon,_:= GjsonCoordsToPolygon(result)
+	result := gjson.Get(jsonStr, "coordinates")
+	//gjson.Get(jsonStr, "name.last")
+	polygon, _ := third_party.GjsonCoordsToPolygon(result)
 	extCoord := polygon.Exterior.Vertices()
+	println("exterior Coordinates")
+	for _, coord := range extCoord {
+		print("x: ", coord.X)
+		println(", y:", coord.Y)
+	}
 	println("extCoords")
 	println(extCoord)
 
