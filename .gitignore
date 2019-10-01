@@ -1,3 +1,5 @@
 .idea/*
 *.code-workspace
 .vscode
+*.iml
+.DS_Store
