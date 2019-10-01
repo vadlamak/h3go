@@ -41,6 +41,7 @@ func getGeoJson(record []string) string {
 }
 
 func main() {
+	//debug
 	c:=getConn()
 	c.Do("SADD","894cc5b2523ffff","fo1","ba1")
 	re,_ := redis.Int(c.Do("EXISTS","894cc5b2523ffff"))
@@ -49,6 +50,7 @@ func main() {
 		println("ass:",ass)
 	}
 	println("reply",re)
+	// debug end
 	start := time.Now()
 	fileName := getFileName()
 	count := 0
