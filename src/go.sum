@@ -16,6 +16,7 @@ github.com/tidwall/match v1.0.1 h1:PnKP62LPNxHKTwvHHZZzdOAOCtsJTjo6dZLCwpKm5xc=
 github.com/tidwall/match v1.0.1/go.mod h1:LujAq0jyVjBy028G1WhWfIzbpQfMO8bBZ6Tyb0+pL9E=
 github.com/tidwall/pretty v1.0.0 h1:HsD+QiTn7sK6flMKIvNmpqz1qrpP3Ps6jOKIKMooyg4=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
+github.com/uber/h3 v3.6.0+incompatible h1:Vu8T7+WOLOybPBh2KnpoggVDrx3qOjoUxzVgK3KUHRo=
 github.com/uber/h3-go v3.0.1+incompatible h1:RVpBm8qd7mM94YuIhNQfCXpVj6mPY6gNsVstDg1FvjY=
 github.com/uber/h3-go v3.0.1+incompatible/go.mod h1:66a2M4rQlf+dtkTWj3bHoLFgDT/Rt4kLT8dMuEQVQvw=
 golang.org/x/tools v0.0.0-20181030221726-6c7e314b6563/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
