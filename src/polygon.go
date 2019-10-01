@@ -10,7 +10,9 @@ func CoordinatesToH3Polygon(r gjson.Result) h3.GeoPolygon {
 	rings := r.Array()
 	count_rings := len(rings)
 	count_interior := count_rings - 1
-	println("count interior:", count_interior)
+	if count_interior >0 {
+		println("count interior:", count_interior)
+	}
 
 	exterior, err := linearRingToH3Geocoord(rings[0])
 
