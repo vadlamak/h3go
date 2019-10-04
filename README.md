@@ -1,15 +1,16 @@
-### POC to attempt ingesting sample points and polygons 
-### and attempt to match point in poly using Uber's H3 library
+POC to attempt ingesting sample points and polygons 
+and attempt to match point in poly using Uber's H3 library
 
-### instructions to set gopath
-- [ ] TODO
+#### Prerequisites
+* set GOPATH
+* have a standalone instance of redis running on default port in localhost
 
-### Usage instructions
+#### Usage instructions
 run the commands in the src folder
 * ingest point - `go run . point`
 * ingest polygon - `go run . polygon`
 
-### Done Statement
+#### Done Statement
 - [x] ingest points
 - [x] ingest polygons
 - [x] run point-in-poly matches
