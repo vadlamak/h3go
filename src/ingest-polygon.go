@@ -41,15 +41,7 @@ func getGeoJson(record []string) string {
 }
 
 func main() {
-	//debug
-	c:=getConn()
-	c.Do("SADD","894cc5b2523ffff","fo1","ba1")
-	re,_ := redis.Int(c.Do("EXISTS","894cc5b2523ffff"))
-	asses,_ := redis.Strings(c.Do("SMEMBERS","894cc5b2523ffff"))
-	for _,ass := range asses {
-		println("ass:",ass)
-	}
-	println("reply",re)
+
 	// debug end
 	start := time.Now()
 	fileName := getFileName()
@@ -64,7 +56,7 @@ func main() {
 	header, _ := r.Read()
 	fmt.Println(header)
 	for i := 0; i < 2; i++ {
-	//for {
+		//for {
 		// Read each record from csv
 		record, err := r.Read()
 		if err == io.EOF {
@@ -87,33 +79,42 @@ func main() {
 func getAssetsForH3Index(h3Indices []h3.H3Index) {
 	c := getConn()
 	for _, h3Index := range h3Indices {
-		fmt.Println("h3Index",h3.ToString(h3Index))
+		fmt.Println("h3Index", h3.ToString(h3Index))
 
-		booleanExists, e := c.Do("EXISTS", h3.ToString(h3Index))
-		exists,e:=redis.Int(booleanExists,e)
+		booleanExists, e := c.Do("SMEMBERS", h3.ToString(h3Index))
+		exists, e := redis.Int(booleanExists, e)
 		println(exists)
-		if exists ==1 {
-			fmt.Println("found a member set:",h3Index)
+		if exists == 1 {
+			fmt.Println("found a member set:", h3Index)
 		}
 
 	}
 }
 
+func buildH3Polygons(jsonStr string) {
+	coordinates := gjson.Get(jsonStr, "coordinates")
+
+	h3polygon := CoordinatesToH3Polygon(coordinates)
+	h3Indices := h3.Polyfill(h3polygon, 9) //polygons matching
+	//if len(h3Indices) == 0 {
+	//	println("no match")
+	//} else {println("matched")}
+	//println("len:", len(h3Indices))
+	getAssetsForH3Index(h3Indices) //reads
+}
 func handlePolygons(record []string) {
 	jsonStr := getGeoJson(record)
 	geoJsonType := gjson.Get(jsonStr, "type").String()
 	switch geoJsonType {
 	case "Polygon":
+		buildH3Polygons(jsonStr)
+
+	case "MultiPolygon":
 		coordinates := gjson.Get(jsonStr, "coordinates")
 
-		h3polygon := CoordinatesToH3Polygon(coordinates)
-		h3Indices := h3.Polyfill(h3polygon, 9)
-		//if len(h3Indices) == 0 {
-		//	println("no match")
-		//} else {println("matched")}
-		//println("len:", len(h3Indices))
-		getAssetsForH3Index(h3Indices)
-	case "MultiPolygon":
+		for _, polygon := range coordinates.Array() {
+
+		}
 	default:
 		panic("unsupported type:" + geoJsonType)
 
