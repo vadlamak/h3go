@@ -1,22 +1,29 @@
 package main
 
 import (
+	"bytes"
+	"encoding/csv"
+	"fmt"
 	"github.com/gistao/RedisGo-Async/redis"
+	"github.com/uber/h3-go"
+	"io"
+	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
-////initialize logger
-//var (
-//	buf    bytes.Buffer
-//	logger = log.New(&buf, "logger: ", log.Lshortfile)
-//)
-//
-//func logError(e error) {
-//	if e != nil {
-//		logger.Fatal(e)
-//	}
-//}
+//initialize logger
+var (
+	buf    bytes.Buffer
+	logger = log.New(&buf, "logger: ", log.Lshortfile)
+)
+
+func logError(e error) {
+	if e != nil {
+		logger.Fatal(e)
+	}
+}
 func getConn() redis.AsynConn {
 	//create conn to standalone redis
 	c, err := redis.AsyncDial("tcp", ":6379")
@@ -27,9 +34,9 @@ func closeConn(c redis.AsynConn) {
 	defer c.Close()
 }
 
-//func getFileName() string {
-//	return os.Args[1]
-//}
+func getFileName() string {
+	return os.Args[1]
+}
 
 func getLatIndex() (int, error) {
 	return strconv.Atoi(os.Args[2])
@@ -43,14 +50,13 @@ func getGroundResolution() (int, error) {
 	return strconv.Atoi(os.Args[4])
 }
 
-//func getFileReader(fileName string) *csv.Reader {
-//	//read the file
-//	f, err := os.Open("../samples/" + fileName)
-//	logError(err)
-//	return csv.NewReader(f)
-//}
+func getFileReader(fileName string) *csv.Reader {
+	//read the file
+	f, err := os.Open("../samples/" + fileName)
+	logError(err)
+	return csv.NewReader(f)
+}
 
-/*
 func main() {
 
 	start := time.Now()
@@ -100,5 +106,3 @@ func main() {
 
 	fmt.Println(&buf)
 }
-
-*/
