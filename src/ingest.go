@@ -31,6 +31,7 @@ func getUsageHelp() string {
 
 func main() {
 	argsLen := len(os.Args)
+
 	if argsLen == 1 {
 		fmt.Println(getUsageHelp())
 		return
@@ -40,20 +41,25 @@ func main() {
 	case "point":
 		switch argsLen {
 		case 2:
-			ingest.IngestSamples("../samples/point/"+os.Args[2], 3, 2, 9)
+			ingest.IngestSamples("../samples/point/lightning_2016.csv", 3, 2, 9)
+		case 3:
+			fname := os.Args[2]
+			ingest.IngestSamples("../samples/point/"+fname, 3, 2, 9)
 		case 5:
+			fname := os.Args[2]
 			lat, _ := strconv.Atoi(os.Args[3])
 			lon, _ := strconv.Atoi(os.Args[4])
 			groundResolution, _ := strconv.Atoi(os.Args[5])
 
-			ingest.IngestSamples("../samples/point/"+os.Args[2], lat, lon, groundResolution)
+			ingest.IngestSamples("../samples/point/"+fname, lat, lon, groundResolution)
 		default:
 			fmt.Println(getPointUsageText())
 		}
 	case "polygon":
 		switch argsLen {
 		case 3:
-			ingest.IngestPolygons("../samples/polygon" + os.Args[2])
+			fname := os.Args[2]
+			ingest.IngestPolygons("../samples/polygon" + fname)
 		case 2:
 			ingest.IngestPolygons("../samples/polygon/zipcodes.csv")
 		default:
