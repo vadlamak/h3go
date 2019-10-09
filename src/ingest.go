@@ -9,18 +9,18 @@ import (
 
 func getPointUsageText() string {
 	return "for `point` sample it is possible to just specify the file name or specify the filename along with the lat,lon and ground resolution as args.\n" +
-		"For ex: ./main point lightning_2016.csv\n" +
+		"For ex: go run ingest.go point lightning_2016.csv\n" +
 		" or \n" +
-		"./main point lightning_2016.csv 3 2 9" +
+		"go run ingest.go point lightning_2016.csv 3 2 9" +
 		" or \n" +
-		"./main point -- will by default ingest lightning_2016.csv from samples/point folder"
+		"go run ingest.go point -- will by default ingest lightning_2016.csv from samples/point folder"
 }
 
 func getPolygonUsageText() string {
 	return "similarly we can ingest polygon data by specifying the file name\n" +
-		"./main polygon zipcodes.csv\n" +
+		"go run ingest.go polygon zipcodes.csv\n" +
 		"or \n" +
-		"./main polygon -- will be default ingest zipcodes.csv from samples/polygon folder"
+		"go run ingest.go polygon -- will be default ingest zipcodes.csv from samples/polygon folder"
 }
 
 func getUsageHelp() string {
