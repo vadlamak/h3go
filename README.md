@@ -6,9 +6,9 @@ and attempt to match point in poly using Uber's H3 library
 * have a standalone instance of redis running on default port in localhost
 
 #### Usage instructions
-run the commands in the src folder
-* ingest point - `go run . point`
-* ingest polygon - `go run . polygon`
+run the commands in the bin folder
+* ingest point - `./ingest point`
+* ingest polygon - `./ingest polygon`
 
 #### Done Statement
 - [x] ingest points
