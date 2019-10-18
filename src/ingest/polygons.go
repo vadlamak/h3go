@@ -46,7 +46,7 @@ func IngestPolygons(fileName string) {
 	//read line # 0 - header
 	header, _ := r.Read()
 	fmt.Println(header)
-	for i := 0; i < 250; i++ {
+	for i := 0; i < 500; i++ {
 	//for {
 
 		// Read each record from csv
@@ -120,12 +120,11 @@ func getAssetsForH3Index(h3Indicies []h3.H3Index, redisConn redis.AsynConn,zipco
 			record := strings.Split(member, " ")
 			assetsMap.Store(zipcode,record)
 			//println(len(record))
-			println("record", record)
-		}
-
-		if len(members) > 0 {
+			//println("record", record)
 			match = match + 1
 		}
+
+		
 	}
 
 }
@@ -151,10 +150,13 @@ func HandlePolygons(record []string, conn redis.AsynConn) {
 		h3polygon := utils.CoordinatesToH3Polygon(coordinates)
 		//st := time.Now()
 		h3Indices := h3.Polyfill(h3polygon, 9) //polygons matching
-		h3IndexMap.Store(zipcode,H3IndiciesToCSV(h3Indices))
-		//elapsed := time.Now().Sub(st)
-		//println("time for polyfill",elapsed )
-		getAssetsForH3Index(h3Indices, conn,zipcode)
+		if len(h3Indices)>0 {
+			compactH3Indicies := h3.Compact(h3Indices)
+			h3IndexMap.Store(zipcode, H3IndiciesToCSV(compactH3Indicies))
+			//elapsed := time.Now().Sub(st)
+			//println("time for polyfill",elapsed )
+			getAssetsForH3Index(compactH3Indicies, conn, zipcode)
+		}
 
 	case "MultiPolygon":
 		//TODO support multi polygons
